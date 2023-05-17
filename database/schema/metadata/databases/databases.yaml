@@ -1,0 +1,9 @@
+- name: crypto_market
+  kind: postgres
+  configuration:
+    connection_info:
+      database_url:
+        from_env: DATABASE_URL
+      isolation_level: read-committed
+      use_prepared_statements: false
+  tables: "!include crypto_market/tables/tables.yaml"

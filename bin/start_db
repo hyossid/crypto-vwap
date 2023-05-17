@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -e
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+PROFILE=${DOCKER_COMPOSE_PROFILE:-'local'}
+
+_docker_compose() {
+  pushd "$DIR/../database/docker" >/dev/null 2>&1 || exit
+  docker-compose --profile $PROFILE --project-name crypto_market $@
+  popd >/dev/null 2>&1 || exit
+}
+
+main() {
+  local cmd=$1
+  case $cmd in
+    up)
+      _docker_compose up -d
+      echo -e "[INFO] Hasura console for DB monitoring will run at \e[32mhttp://localhost:61790/console\e[m"
+      echo '    with admin secret: sidneyPassword'
+
+      if [[ $2 == '--no-init' ]]; then
+        echo "skip apply hasura migration"
+      else
+        echo -n "[INFO] Waiting for Hasura initialization"
+        for _ in $(seq 1 999); do
+          echo -n .
+          if curl -so /dev/null http://localhost:61790/v1/version; then
+            echo
+            echo "[INFO] Applying migrations"
+            yarn hasura metadata apply &&
+              yarn hasura migrate apply --all-databases &&
+              yarn hasura metadata reload
+            exit 0
+          fi
+          sleep 0.5
+        done
+        echo "[ERROR] Failed to connect to local hasura console"
+      fi
+      ;;
+    down)
+      _docker_compose down $@
+      ;;
+    *)
+      echo "[INFO] Currently Only supports up & down command "
+      exit 1
+      ;;
+  esac
+}
+
+main $@

@@ -1,0 +1,25 @@
+.DS_Store
+.idea/
+node_modules/
+dist/
+/bin/cli-hasura-*
+/bin/docker/wait
+/database/schema/config.yaml
+/database/typegen.config.js
+
+# yarn v3
+package-lock.json
+yarn-error.log
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# env
+.env.example
+database/typegen.config.js
+database/docker/docker-compose.yaml
+/.env

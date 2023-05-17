@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -e
+export BINDIR="$( dirname "${BASH_SOURCE[0]}" )"
+HASURA_VERSION=v2.24.1
+CLI_PATH=cli-hasura-$($BINDIR/osarch)-${HASURA_VERSION}
+
+if [ ! -e "${BINDIR}/${CLI_PATH}" ]; then
+  rm -f ${BINDIR}/cli-hasura-*
+  $BINDIR/download https://github.com/hasura/graphql-engine/releases/download/${HASURA_VERSION}/cli-hasura-$($BINDIR/osarch) ${BINDIR}/${CLI_PATH}
+  chmod +x ${BINDIR}/${CLI_PATH}
+fi
+
+${BINDIR}/${CLI_PATH} --skip-update-check $@
