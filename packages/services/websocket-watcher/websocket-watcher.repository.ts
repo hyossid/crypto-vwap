@@ -25,16 +25,19 @@ export class WebSocketWatcherRepository {
                                       ticker,
                                       ts,
                                       quantity,
-                                      price)
+                                      price,
+                                      is_validated)
           values (${params.tradeid},
                   ${params.ticker},
                   ${params.ts},
                   ${params.quantity},
-                  ${params.price}) on conflict(tradeid) 
+                  ${params.price},
+                  ${false}) on conflict(tradeid) 
                   do update set ticker = ${params.ticker},
                   ts = ${params.ts},
                   quantity = ${params.quantity},
-                  price = ${params.price}
+                  price = ${params.price},
+                  is_validated = ${false}
           returning *`);
       },
     );

@@ -2,6 +2,7 @@ import { Inject, Logger } from '@nestjs/common';
 import { noAwait } from '@root/commons/promise/no-await';
 import PQueue from 'p-queue';
 import { RestWatcherService } from '../rest-watcher/rest-watcher.interface';
+import { VWAPCalculatorService } from '../vwap-calculator/vwap-calculator.interface';
 import { WebSocketWatcherService } from '../websocket-watcher/websocket-watcher.interface';
 import { MarketWatcherService } from './market-watcher.interface';
 
@@ -16,11 +17,14 @@ export class DefaultMarketWatcherServiceService
     private readonly webSocketWatcherService: WebSocketWatcherService,
     @Inject(RestWatcherService)
     private readonly restWatcherService: RestWatcherService,
+    @Inject(VWAPCalculatorService)
+    private readonly vwapCalculatorService: VWAPCalculatorService,
   ) {}
 
   async start(features: {
     websocket: boolean;
-    trades: boolean;
+    rest: boolean;
+    vwapdb: boolean;
   }): Promise<void> {
     if (features.websocket) {
       noAwait(
@@ -30,9 +34,17 @@ export class DefaultMarketWatcherServiceService
       );
     }
 
-    if (features.trades) {
+    if (features.rest) {
       noAwait(
         this.queue.add(() => this.restWatcherService.startRestWatching()),
+      );
+    }
+
+    if (features.vwapdb) {
+      noAwait(
+        this.queue.add(() =>
+          this.vwapCalculatorService.startCalculateVWAPfromDB(),
+        ),
       );
     }
   }

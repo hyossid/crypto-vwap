@@ -1,6 +1,7 @@
 import { Inject, Logger } from '@nestjs/common';
 import WebSocket from 'ws';
 
+import { RedisClientType, createClient } from 'redis';
 import {
   RawTransaction,
   WebSocketWatcherService,
@@ -9,9 +10,14 @@ import { WebSocketWatcherRepository } from './websocket-watcher.repository';
 
 const kReconnectWaitMs = 100;
 const MARKET_WS_URL = 'ws://35.241.105.108/stream';
+const REDIS_PORT = 61792;
+const REDIS_HOST = 'localhost';
+const REDIS_DATA_KEY = 'data';
+const BUFFER_LIFETIME = 5 * 60;
 export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
   private logger = new Logger(DefaultWebSocketWatcherService.name);
   private client: undefined | WebSocket;
+  private redisClient: undefined | RedisClientType;
   private closed: boolean;
   private readonly endpoint = MARKET_WS_URL;
 
@@ -29,27 +35,14 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
     };
   }
 
-  // private startSubscriptionsIfNecessary() {
-  //   for (const processName in this.syncProcesses) {
-  //     let processSubscription = this.syncProcessesSubscription[processName];
-  //     const process = this.syncProcesses[processName];
-  //     assert(process, `Process ${processName} not found`);
-  //     if (processSubscription == null) {
-  //       processSubscription = { logs: {} };
-  //       this.syncProcessesSubscription[processName] = processSubscription;
-  //     }
-
-  //     if (processSubscription.logs.requestId == null) {
-  //       this.subscribeProcess(process, processSubscription);
-  //     }
-  //   }
-  // }
-
   async startWebSocketWatching() {
     this.logger.verbose(`Starting websocket watching`);
     // TODO : Initial setting if needed
 
     if (this.client !== undefined) {
+      return;
+    }
+    if (this.redisClient !== undefined) {
       return;
     }
 
@@ -60,6 +53,9 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
 
     this.logger.debug(`connecting wss to ${this.endpoint}`);
     this.client = new WebSocket(this.endpoint);
+    this.redisClient = createClient({
+      url: `redis://${REDIS_HOST}:${REDIS_PORT}`,
+    });
     this.closed = false;
 
     this.client.onopen = () => {
@@ -70,39 +66,34 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
     this.client.onerror = (event: { error: Error }) => {
       this.onError(event.error);
     };
+    this.redisClient.on('error', err => console.log('Redis Client Error', err));
+
+    await this.redisClient.connect();
 
     this.client.onmessage = async (event: { data: any }) => {
       const msg = String(event.data);
+
       try {
         const m = JSON.parse(msg);
         console.log(m);
 
-        // Validate input
-        await this.insertTransaction({
+        // TODO : Validate input
+        await this.insertTransactionToDB({
           ts: m.ts,
           ticker: m.ticker,
           quantity: m.quantity,
           price: m.price,
           tradeid: m.tradeid,
         });
-        // if (m.id != null) {
-        //   this.receiveResponse(m.id, m);
-        // } else if (m.method === 'eth_subscription' && m.params != null) {
-        //   const params = m.params;
-        //   const subscriptionId = params.subscription;
-        //   const result = params.result;
-        //   if (subscriptionId != null && result != null) {
-        //     const processSubscriptionId =
-        //       this.syncProcessesSubscriptionId[subscriptionId];
-        //     if (processSubscriptionId != null) {
-        //       const process =
-        //         this.syncProcesses[processSubscriptionId.processName];
-        //       if (process != null) {
-        //         process.onEvent(processSubscriptionId.subscriptionType, result);
-        //       }
-        //     }
-        //   }
-        // }
+
+        // TODO : Parallelize
+        // await this.insertTransationToBuffer({
+        //   ts: m.ts,
+        //   ticker: m.ticker,
+        //   quantity: m.quantity,
+        //   price: m.price,
+        //   tradeid: m.tradeid,
+        // });
       } catch (e) {
         this.onError(e as Error);
       }
@@ -122,21 +113,6 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
         console.info('The connection has been closed successfully.');
       }
     };
-
-    // for (;;) {
-    //   for (const address of addresses) {
-    //     await this.fetchAndSaveTxsOnStacks(address);
-    //   }
-
-    //   await this.chainWatcherRepository.u0_processIncomingTxsOnStacks();
-    //   await this.chainWatcherRepository.w4_processTokensoftBridgeTxOnStacks();
-    //   await this.chainWatcherRepository.w5_processSendToUserTxOnStacks();
-
-    //   if (options.once) {
-    //     break;
-    //   }
-    //   await sleep(10000);
-    // }
   }
 
   private async restartUnexpectedClosedWebsocket() {
@@ -156,7 +132,36 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
     this.onReconnect();
   }
 
-  async insertTransaction({
+  // async insertTransationToBuffer({
+  //   ts,
+  //   ticker,
+  //   quantity,
+  //   price,
+  //   tradeid,
+  // }: RawTransaction): Promise<void> {
+  //   if (this.redisClient === undefined) {
+  //     console.error("Couldn't reconnect to redis. Error callback is called.");
+  //     return;
+  //   }
+  //   const serializedObject = JSON.stringify({
+  //     ts,
+  //     ticker,
+  //     quantity,
+  //     price,
+  //     tradeid,
+  //   });
+
+  //   // Assume no outliers join the buffer
+  //   if (ts < Date.now() - BUFFER_LIFETIME * 1000) return;
+  //   await this.redisClient.ZADD(REDIS_DATA_KEY, {
+  //     score: ts,
+  //     value: serializedObject,
+  //   });
+
+  //   return;
+  // }
+
+  async insertTransactionToDB({
     ts,
     ticker,
     quantity,

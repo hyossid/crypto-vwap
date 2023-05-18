@@ -10,7 +10,7 @@ async function bootstrap() {
 
   const worker = app.get(MarketWatcherService);
 
-  await worker.start({ websocket: true, trades: true });
+  await worker.start({ websocket: true, rest: true, vwapdb: true });
 }
 
 if (require.main == module) {

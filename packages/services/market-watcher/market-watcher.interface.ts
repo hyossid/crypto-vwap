@@ -1,3 +1,7 @@
 export abstract class MarketWatcherService {
-  abstract start(feat: { websocket: boolean; trades: boolean }): Promise<void>;
+  abstract start(feat: {
+    websocket: boolean;
+    rest: boolean;
+    vwapdb: boolean;
+  }): Promise<void>;
 }

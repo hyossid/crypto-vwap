@@ -6,6 +6,7 @@
   "private": true,
   "license": "hyossid (huvsid@gmail.com)",
   "scripts": {
+    "start:api": "ts-node packages/api/main.ts",
     "start:worker": "ts-node packages/worker/main.worker.ts",
     "start:db": "bin/start_db up",
     "hasura": "cd database/schema && ../../bin/hasura-cli",
@@ -38,6 +39,7 @@
     "csv-parse": "^5.3.10",
     "fs": "^0.0.1-security",
     "p-queue": "^6.6.2",
+    "redis": "^4.6.6",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "slonik": "^29.2.0",

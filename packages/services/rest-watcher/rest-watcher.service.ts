@@ -9,7 +9,7 @@ export class DefaultRestWatcherService implements RestWatcherService {
 
   constructor(
     @Inject(RestWatcherRepository)
-    private readonly RestWatcherRepository: RestWatcherRepository,
+    private readonly restWatcherRepository: RestWatcherRepository,
   ) {}
 
   async startRestWatching() {
