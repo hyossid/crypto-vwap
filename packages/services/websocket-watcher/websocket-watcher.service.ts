@@ -12,15 +12,14 @@ const kReconnectWaitMs = 100;
 const MARKET_WS_URL = 'ws://35.241.105.108/stream';
 const REDIS_PORT = 61792;
 const REDIS_HOST = 'localhost';
-const REDIS_DATA_KEY = 'data';
-const BUFFER_LIFETIME = 5 * 60;
+
 export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
   private logger = new Logger(DefaultWebSocketWatcherService.name);
   private client: undefined | WebSocket;
   private redisClient: undefined | RedisClientType;
   private closed: boolean;
   private readonly endpoint = MARKET_WS_URL;
-
+  //private isFirst: boolean;
   onError: (error: Error) => void;
   onReconnect: () => void;
 
@@ -29,6 +28,7 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
     private readonly webSocketWatcherRepository: WebSocketWatcherRepository, // typedEnv('ETH_NODE_WS_URL') //   .optional() //   .toString(),
   ) {
     this.closed = true;
+    //  this.isFirst = true;
     this.onError = console.error;
     this.onReconnect = () => {
       void 0;
@@ -38,7 +38,6 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
   async startWebSocketWatching() {
     this.logger.verbose(`Starting websocket watching`);
     // TODO : Initial setting if needed
-
     if (this.client !== undefined) {
       return;
     }
@@ -75,7 +74,11 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
 
       try {
         const m = JSON.parse(msg);
-        console.log(m);
+
+        await this.webSocketWatcherRepository.insertInitialValidationTime({
+          ts: m.ts,
+          ticker: m.ticker,
+        });
 
         // TODO : Validate input
         await this.insertTransactionToDB({

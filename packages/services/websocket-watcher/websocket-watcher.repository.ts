@@ -1,7 +1,10 @@
 import { Inject, Logger } from '@nestjs/common';
 import { PersistentService } from '@root/persistent/persistent.interface';
 import { sql } from 'slonik';
-import { TransactionsSchema } from './websocket-watcher.repository.sql';
+import {
+  TickersValidationTimestamp,
+  TransactionsSchema,
+} from './websocket-watcher.repository.sql';
 
 export class WebSocketWatcherRepository {
   private readonly logger = new Logger(WebSocketWatcherRepository.name);
@@ -39,7 +42,21 @@ export class WebSocketWatcherRepository {
                   price = ${params.price},
                   is_validated = ${false}
           returning *`);
+
+        // await conn.one(sql<TickerSchema>`
+        //   insert into crypto_market.tickers
+        //       (ticker)
+        //   values (${params.ticker})
+        //   on conflict(ticker) do nothing;`);
       },
     );
+  }
+
+  async insertInitialValidationTime(params: { ts: number; ticker: string }) {
+    await this.persistentService.pgPool.any(sql<TickersValidationTimestamp>`
+          insert into crypto_market.tickers_validation_timestamp(ticker,
+                                    validated_until)
+          values (${params.ticker},
+                  ${params.ts}) on conflict do nothing`);
   }
 }

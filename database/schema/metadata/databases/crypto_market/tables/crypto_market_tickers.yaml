@@ -1,0 +1,3 @@
+table:
+  name: tickers
+  schema: crypto_market

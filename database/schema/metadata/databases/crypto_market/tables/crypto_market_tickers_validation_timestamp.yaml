@@ -1,0 +1,3 @@
+table:
+  name: tickers_validation_timestamp
+  schema: crypto_market

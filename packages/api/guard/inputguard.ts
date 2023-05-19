@@ -4,7 +4,6 @@ import { ExecutionContext, Injectable } from '@nestjs/common';
 export class InputGuard {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    console.log(request.query);
     if (!request.query.ticker) {
       return false;
     }

@@ -1,7 +1,11 @@
 import { Inject, Logger } from '@nestjs/common';
 import { PersistentService } from '@root/persistent/persistent.interface';
 import { sql } from 'slonik';
-import { TransactionsSchema } from './rest-watcher.repository.sql';
+import {
+  Ticker,
+  TickersValidationTimestamp,
+  TransactionsSchema,
+} from './rest-watcher.repository.sql';
 
 export class RestWatcherRepository {
   private readonly logger = new Logger(RestWatcherRepository.name);
@@ -10,6 +14,16 @@ export class RestWatcherRepository {
     @Inject(PersistentService)
     private readonly persistentService: PersistentService,
   ) {}
+
+  async getSupportedTickers() {
+    return this.persistentService.pgPool.any(sql<Ticker>`
+        select * from crypto_market.tickers;`);
+  }
+
+  async getLatestValidatedTime(params: { ticker: string }) {
+    return this.persistentService.pgPool.any(sql<TickersValidationTimestamp>`
+        select * from crypto_market.tickers_validation_timestamp where ticker = ${params.ticker};`);
+  }
 
   async insertReliableTransaction(params: {
     ts: number;

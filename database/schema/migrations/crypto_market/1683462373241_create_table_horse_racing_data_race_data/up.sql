@@ -1,4 +1,21 @@
 CREATE SCHEMA "crypto_market";
+
+CREATE TABLE "crypto_market"."tickers"
+(
+    "ticker" varchar NOT NULL,
+    PRIMARY KEY ("ticker")
+);COMMENT ON TABLE "crypto_market"."tickers" IS E'Supported Tickers, which is received from websocket';
+
+
+CREATE TABLE "crypto_market"."tickers_validation_timestamp"
+(
+    "ticker" varchar NOT NULL,
+    "validated_until" numeric NOT NULL,
+    PRIMARY KEY ("ticker")
+);COMMENT ON TABLE "crypto_market"."tickers_validation_timestamp" IS E'Latest reliable timestamp of ticker';
+
+
+
 CREATE TABLE "crypto_market"."transactions"
 (
     "tradeid" varchar NOT NULL,

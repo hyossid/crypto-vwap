@@ -1,3 +1,5 @@
 - "!include crypto_market_transactions.yaml"
 - "!include crypto_market_vwap_history.yaml"
 - "!include crypto_market_latest_vwap_history.yaml"
+- "!include crypto_market_tickers.yaml"
+- "!include crypto_market_tickers_validation_timestamp.yaml"
