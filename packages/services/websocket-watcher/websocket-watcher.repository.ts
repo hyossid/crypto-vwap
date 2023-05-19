@@ -4,6 +4,7 @@ import { sql } from 'slonik';
 import {
   TickersValidationTimestamp,
   TransactionsSchema,
+  ValidatedUntil,
 } from './websocket-watcher.repository.sql';
 
 export class WebSocketWatcherRepository {
@@ -42,21 +43,31 @@ export class WebSocketWatcherRepository {
                   price = ${params.price},
                   is_validated = ${false}
           returning *`);
-
-        // await conn.one(sql<TickerSchema>`
-        //   insert into crypto_market.tickers
-        //       (ticker)
-        //   values (${params.ticker})
-        //   on conflict(ticker) do nothing;`);
       },
     );
   }
 
   async insertInitialValidationTime(params: { ts: number; ticker: string }) {
-    await this.persistentService.pgPool.any(sql<TickersValidationTimestamp>`
+    await this.persistentService.pgPool.transaction(async conn => {
+      const curTs = await conn.any(sql<ValidatedUntil>`
+      select validated_until from crypto_market.tickers_validation_timestamp where ticker = ${params.ticker}`);
+
+      if (curTs.length == 0) {
+        await conn.any(sql<TickersValidationTimestamp>`
+        insert into crypto_market.tickers_validation_timestamp(ticker,
+                                  validated_until)
+        values (${params.ticker},
+                ${params.ts}) on conflict do nothing`);
+      } else {
+        if (curTs[0].validated_until > params.ts) {
+          await conn.any(sql<TickersValidationTimestamp>`
           insert into crypto_market.tickers_validation_timestamp(ticker,
                                     validated_until)
           values (${params.ticker},
-                  ${params.ts}) on conflict do nothing`);
+                  ${params.ts}) on conflict(ticker) do update set validated_until = ${params.ts}`);
+        }
+        return;
+      }
+    });
   }
 }

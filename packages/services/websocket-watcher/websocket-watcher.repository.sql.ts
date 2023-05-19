@@ -12,3 +12,7 @@ export interface TickersValidationTimestamp {
 export interface TickerSchema {
   ticker: string;
 }
+
+export interface ValidatedUntil {
+  validated_until: number;
+}

@@ -23,6 +23,13 @@ export class VWAPCalculatorRepository {
                 where ticker = ${ticker};`);
   }
 
+  async getHistoricalTickerFromDb(ticker: string, ts: number) {
+    return await this.persistentService.pgPool.any(sql<LatestTicker>`
+        select * 
+                from crypto_market.vwap_history
+                where ticker = ${ticker} and ts = ${ts};`);
+  }
+
   async processSavingVolumeInDb() {
     const currentTimestampInSeconds = Math.floor(Date.now() / 1000) * 1000;
 
@@ -39,11 +46,12 @@ export class VWAPCalculatorRepository {
       for (const vwap of vwaps) {
         await this.persistentService.pgPool.query(sql<_void>`
                   insert into crypto_market.vwap_history
-                      (ticker, ts, price, interval)
+                      (ticker, ts, price, interval, is_validated)
                   values (${vwap.ticker},
                           ${currentTimestampInSeconds},
                           ${vwap.vwap},
-                          ${INTERVAL.toString()})
+                          ${INTERVAL.toString()},
+                          ${false})
                   on conflict(ticker,ts) do nothing;`);
 
         await this.persistentService.pgPool.query(sql<_void>`
@@ -58,7 +66,7 @@ export class VWAPCalculatorRepository {
                   price = ${vwap.vwap};`);
 
         this.logger.log(
-          `Calculated and saving VWAP at timestamp : ${currentTimestampInSeconds}`,
+          `[WebSocket] Calculated and saving VWAP of ${vwap.ticker} at timestamp : ${currentTimestampInSeconds}`,
         );
       }
     });

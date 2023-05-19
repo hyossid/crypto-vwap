@@ -6,7 +6,7 @@ export interface TransactionsSchema {
   price: number;
 }
 
-export interface Ticker {
+export interface AvailableTickers {
   ticker: string;
 }
 

@@ -15,7 +15,6 @@ export class GetLatestVWAPResponse {}
 @Controller()
 export class VWAPController {
   private readonly logger = new Logger(VWAPController.name);
-  tokenBridgeReaderService: any;
   constructor(
     @Inject(VWAPCalculatorService)
     private readonly vwapCalculatorService: VWAPCalculatorService,
@@ -27,7 +26,7 @@ export class VWAPController {
   async getLatestVWAP(
     @Query('ticker') ticker: string,
   ): Promise<GetLatestVWAPResponse> {
-    this.logger.debug(`GET /latest: ${ticker}`);
+    this.logger.debug(`[API] GET /latest: ${ticker}`);
 
     const latestTicker = await this.vwapCalculatorService.getLatestTicker(
       ticker,
@@ -37,6 +36,25 @@ export class VWAPController {
       ticker,
       price: latestTicker[0].price,
       ts: latestTicker[0].ts,
+    };
+  }
+
+  @UseGuards(InputGuard)
+  @ApiOkResponse({ type: GetLatestVWAPResponse })
+  @Get('/historical')
+  async getHistoricalVWAP(
+    @Query('ticker') ticker: string,
+    @Query('ts') ts: number,
+  ): Promise<GetLatestVWAPResponse> {
+    this.logger.debug(`[API] GET /historical: ${ticker}, timestamp : ${ts}`);
+
+    const historicalTicker =
+      await this.vwapCalculatorService.getHistoricalTicker(ticker, ts);
+
+    return {
+      ticker,
+      vwap: historicalTicker[0].price,
+      ts: historicalTicker[0].ts,
     };
   }
 }

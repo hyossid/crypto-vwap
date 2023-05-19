@@ -1,12 +1,5 @@
 CREATE SCHEMA "crypto_market";
 
-CREATE TABLE "crypto_market"."tickers"
-(
-    "ticker" varchar NOT NULL,
-    PRIMARY KEY ("ticker")
-);COMMENT ON TABLE "crypto_market"."tickers" IS E'Supported Tickers, which is received from websocket';
-
-
 CREATE TABLE "crypto_market"."tickers_validation_timestamp"
 (
     "ticker" varchar NOT NULL,
@@ -37,6 +30,7 @@ CREATE TABLE "crypto_market"."vwap_history"
     "ts" numeric NOT NULL,
     "price" numeric NOT NULL,
     "interval" varchar NOT NULL,
+    "is_validated" boolean NOT NULL,
     PRIMARY KEY ("ticker","ts")
 );COMMENT ON TABLE "crypto_market"."vwap_history" IS E'vwap history data ';
 

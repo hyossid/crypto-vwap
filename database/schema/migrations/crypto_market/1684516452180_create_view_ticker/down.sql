@@ -1,0 +1,1 @@
+DROP VIEW crypto_market.available_tickers;
