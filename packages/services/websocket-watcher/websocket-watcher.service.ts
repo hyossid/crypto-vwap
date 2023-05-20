@@ -20,7 +20,7 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
 
   constructor(
     @Inject(WebSocketWatcherRepository)
-    private readonly webSocketWatcherRepository: WebSocketWatcherRepository, // typedEnv('ETH_NODE_WS_URL') //   .optional() //   .toString(),
+    private readonly webSocketWatcherRepository: WebSocketWatcherRepository,
   ) {
     this.closed = true;
     this.onError = console.error;
@@ -31,7 +31,7 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
 
   async startWebSocketWatching() {
     this.logger.verbose(`[WebSocket] Starting websocket watching`);
-    // TODO : Initial setting if needed
+
     if (this.client !== undefined) {
       return;
     }
@@ -67,15 +67,6 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
           price: m.price,
           tradeid: m.tradeid,
         });
-
-        // TODO : Parallelize
-        // await this.insertTransationToBuffer({
-        //   ts: m.ts,
-        //   ticker: m.ticker,
-        //   quantity: m.quantity,
-        //   price: m.price,
-        //   tradeid: m.tradeid,
-        // });
       } catch (e) {
         this.onError(e as Error);
       }

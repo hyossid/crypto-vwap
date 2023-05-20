@@ -3,7 +3,6 @@ import { VWAPCalculatorService } from './vwap-calculator.interface';
 import { VWAPCalculatorRepository } from './vwap-calculator.repository';
 import { LatestTicker } from './vwap-calculator.repository.sql';
 
-const BUFFER_LIFETIME = 5 * 60;
 export class DefaultVWAPCalculatorService implements VWAPCalculatorService {
   private logger = new Logger(DefaultVWAPCalculatorService.name);
 

@@ -5,7 +5,6 @@ dist/
 /bin/cli-hasura-*
 /bin/docker/wait
 /database/schema/config.yaml
-/database/typegen.config.js
 
 # yarn v3
 package-lock.json

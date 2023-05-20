@@ -26,6 +26,10 @@ export class DefaultMarketWatcherServiceService
     rest: boolean;
     vwapdb: boolean;
   }): Promise<void> {
+    this.logger.log(
+      `[WORKER] Starting Worker with option websocket : ${features.websocket} , rest : ${features.rest} , vwapdb : ${features.vwapdb}`,
+    );
+
     if (features.websocket) {
       noAwait(
         this.queue.add(() =>
