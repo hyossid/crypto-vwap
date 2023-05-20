@@ -6,6 +6,7 @@
   "private": true,
   "license": "hyossid (huvsid@gmail.com)",
   "scripts": {
+    "env": "bin/use-env.sh",
     "start:api": "ts-node packages/api/main.ts",
     "start:worker": "ts-node packages/worker/main.worker.ts",
     "start:db": "bin/start_db up",
@@ -47,6 +48,7 @@
     "rxjs": "^7.2.0",
     "slonik": "^29.2.0",
     "slonik-interceptor-query-logging": "^1.4.7",
+    "source-map-support": "^0.5.21",
     "ws": "^8.13.0"
   },
   "devDependencies": {

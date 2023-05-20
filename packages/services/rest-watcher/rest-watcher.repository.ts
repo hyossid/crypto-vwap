@@ -11,7 +11,9 @@ import {
   TransactionsSchema,
 } from './rest-watcher.repository.sql';
 
-const INTERVAL = 5 * 60 * 1000;
+const INTERVAL = process.env.INTERVAL
+  ? Number(process.env.INTERVAL)
+  : 5 * 60 * 1000;
 
 export class RestWatcherRepository {
   private readonly logger = new Logger(RestWatcherRepository.name);

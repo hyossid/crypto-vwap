@@ -7,7 +7,9 @@ import {
   _void,
 } from './vwap-calculator.repository.sql';
 
-const INTERVAL = 5 * 60 * 1000;
+const INTERVAL = process.env.INTERVAL
+  ? Number(process.env.INTERVAL)
+  : 5 * 60 * 1000;
 export class VWAPCalculatorRepository {
   private readonly logger = new Logger(VWAPCalculatorRepository.name);
 

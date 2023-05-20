@@ -1,0 +1,26 @@
+ARG BASE_IMAGE=node:16.17.1-bullseye-slim
+FROM $BASE_IMAGE
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+COPY package.json /build/package.json
+COPY yarn.lock /build/yarn.lock
+RUN yarn install --production --frozen-lockfile && \
+    mv node_modules /node_modules && \
+    yarn && \
+    du -hs /node_modules && \
+    du -hs node_modules
+COPY bin /build/bin
+COPY tsconfig.json /build/tsconfig.json
+COPY packages /build/packages
+RUN yarn build
+
+FROM $BASE_IMAGE
+WORKDIR /app
+COPY package.json /app/package.json
+COPY --from=0 /node_modules /app/node_modules
+COPY --from=0 /build/dist /app/node_modules/@root
+COPY --from=0 /build/bin /app/bin
+CMD /app/bin/start-api

@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    environment:
+      PG_STRING: 'postgres://postgres:postgres@postgres/crypto_market'
+      MARKET_WS_URL: 'ws://35.241.105.108/stream'
+      MARKET_REST_URL: 'http://35.241.105.108/trades'
+      INTERVAL: 300000
+    networks:
+      - crypto_market_default
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    depends_on:
+      - worker
+    environment:
+      PG_STRING: 'postgres://postgres:postgres@postgres/crypto_market'
+      INTERVAL: 300000
+    ports:
+      - '3003:3003'
+    networks:
+      - crypto_market_default
+networks:
+  crypto_market_default:
+    external: true

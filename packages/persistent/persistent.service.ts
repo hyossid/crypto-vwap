@@ -11,8 +11,9 @@ import {
 import { createQueryLoggingInterceptor } from 'slonik-interceptor-query-logging';
 import { PersistentService } from './persistent.interface';
 
-const PG_CONNECTION_STRING =
-  'postgres://postgres:postgres@localhost:61791/crypto_market';
+const PG_CONNECTION_STRING = process.env.PG_STRING
+  ? process.env.PG_STRING
+  : 'postgres://postgres:postgres@localhost:61791/crypto_market';
 
 export class DefaultPersistentService
   extends PersistentService

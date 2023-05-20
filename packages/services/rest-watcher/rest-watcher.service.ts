@@ -4,7 +4,10 @@ import { RestWatcherService } from '@root/services/rest-watcher/rest-watcher.int
 import { RestWatcherRepository } from '@root/services/rest-watcher/rest-watcher.repository';
 import fetch from 'cross-fetch';
 import PQueue from 'p-queue';
-const MARKET_REST_URL = 'http://35.241.105.108/trades';
+
+const MARKET_REST_URL = process.env.MARKET_REST_URL
+  ? process.env.MARKET_REST_URL
+  : 'http://35.241.105.108/trades';
 export class DefaultRestWatcherService implements RestWatcherService {
   private logger = new Logger(DefaultRestWatcherService.name);
 

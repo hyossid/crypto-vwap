@@ -7,8 +7,10 @@ import {
 } from './websocket-watcher.interface';
 import { WebSocketWatcherRepository } from './websocket-watcher.repository';
 
-const kReconnectWaitMs = 100;
-const MARKET_WS_URL = 'ws://35.241.105.108/stream';
+const WEBSOCKET_RECONNECT = 100;
+const MARKET_WS_URL = process.env.MARKET_WS_URL
+  ? process.env.MARKET_WS_URL
+  : 'ws://35.241.105.108/stream';
 
 export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
   private logger = new Logger(DefaultWebSocketWatcherService.name);
@@ -77,10 +79,10 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
         this.client = undefined;
 
         console.error(
-          `[WebSocket] Connection closed unexpectedly or because of timeout. Reconnecting after ${kReconnectWaitMs}ms.`,
+          `[WebSocket] Connection closed unexpectedly or because of timeout. Reconnecting after ${WEBSOCKET_RECONNECT}ms.`,
         );
 
-        await new Promise(f => setTimeout(f, kReconnectWaitMs));
+        await new Promise(f => setTimeout(f, WEBSOCKET_RECONNECT));
         await this.restartUnexpectedClosedWebsocket();
       } else {
         console.info(

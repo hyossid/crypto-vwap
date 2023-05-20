@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -e
+cd $(dirname "${BASH_SOURCE[0]}")
+cd ..
+export BASEDIR=$(pwd)
+
+cd $BASEDIR
+node -r source-map-support/register /app/node_modules/@root/api/main.js
