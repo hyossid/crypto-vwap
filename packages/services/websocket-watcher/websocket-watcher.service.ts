@@ -47,8 +47,10 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
       this.logger.debug(`[WebSocket] connected to ${this.endpoint}`);
     };
 
-    this.client.onerror = (event: { error: Error }) => {
+    this.client.onerror = async (event: { error: Error }) => {
       this.onError(event.error);
+      await new Promise(f => setTimeout(f, WEBSOCKET_RECONNECT));
+      await this.restartUnexpectedClosedWebsocket();
     };
 
     this.client.onmessage = async (event: { data: any }) => {
