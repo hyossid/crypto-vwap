@@ -15,32 +15,35 @@ The configuration options for the input channels and the interval (defaulted to 
 
 
 
-1. API Controller : API Controller is a node.js REST API server where handles user's request, pulls data from DB and give response. Input us guarded using `guard` Nest.js decorator. Swagger is available on `<host>:port/swagger.json`. 
+1. **API Controller** : API Controller is a node.js REST API server where handles user's request, pulls data from DB and give response. Input us guarded using `guard` Nest.js decorator. Swagger is available on `<host>:port/swagger.json`. 
   - Currently available endpoints are :
     - /health : Checks status of API 
     - /latest : Returns latest 5 minute rolling VWAP (Params: {‘ticker’: ‘BTC’})
     - /historical : Returns 5 minute rolling VWAP as of a timestamp (Params: {‘ticker’: ‘BTC’, ‘ts’: 1684083600000 })
 
-2. websocket-watcher: The websocket-watcher module establishes a WebSocket connection to the designated endpoint. It validates the initial input format and saves the data to the database. Since the data received through WebSocket might be faulty, a flag is_validated is set to false for these entries.
-3. vwap-calculator: The vwap-calculator module calculates the latest VWAP based on the data received through WebSocket. It then saves the calculated VWAP value to the database, along with the corresponding ticker and timestamp in the second mark.
-4. rest-watcher: The rest-watcher module is responsible for requesting trade data from the REST endpoint. It processes the data in parallel (asynchronously) based on the ticker. It requests the data, receives the response, and updates the database with a is_validated flag set to true for the received entries. It also calculates the VWAP using the reliable data source obtained from the REST endpoint. Additionally, it saves the latest received timestamp (since the response is limited to 100 data points) for stateful processing.
-5. Postgres : Main database for this project. 
+2. **websocket-watcher**: The websocket-watcher module establishes a WebSocket connection to the designated endpoint. It validates the initial input format and saves the data to the database. Since the data received through WebSocket might be faulty, a flag is_validated is set to false for these entries.
+3. **vwap-calculator**: The vwap-calculator module calculates the latest VWAP based on the data received through WebSocket. It then saves the calculated VWAP value to the database, along with the corresponding ticker and timestamp in the second mark.
+4. **rest-watcher**: The rest-watcher module is responsible for requesting trade data from the REST endpoint. It processes the data in parallel (asynchronously) based on the ticker. It requests the data, receives the response, and updates the database with a is_validated flag set to true for the received entries. It also calculates the VWAP using the reliable data source obtained from the REST endpoint. Additionally, it saves the latest received timestamp (since the response is limited to 100 data points) for stateful processing.
+5. **Postgres** : Main database for this project. 
   - transactions (tradeid, quantity, price, ticker, ts, is_validated) : Trade data from Websocket & REST
   - vwap_history (ticker, price, ts, interval, is_validated) : Calculated VWAP values in timeseries
   - latest_vap_history (ticker, price, ts, interval) : Latest VWAP 
   - tickers_validation_timestamp (ticker, validated_until) : Records last validated timestamp by ticker
   - available_tickers (ticker) : It is database view to record existing tickers  
-6. Hasura console : This console is for DB monitoring for good development experience. It also tracks schema migration
+6. **Hasura console** : This console is for DB monitoring for good development experience. It also tracks schema migration
 
-rational behind design : 
+**Rational behind design**
+- Data streaming usually requires buffer. However, assuming each record is 0.1KB, and rate seems to be maximum 50 records per second in websocket. 0.1 * 50 * 100000 (approximate 1day) = 500MB per day, 50 * 4 = 200 QPS for postgres is not heavy either read/write. 
 - Hasura is a graphql engine, but it is really a good tool to track migration, monitor DB and run SQL without using independent tool such as pgadmin, datagrip.
 - using slonik rather than ORM, since sql is much reliable.
-
+- docker-compose 
+- 
 ## Getting started
 
-1. ./bin/start_db up 
-2. docker-compose up -d 
-3. docker ps 
+
+1. ./bin/start_db up  // setup database and hasura
+2. docker-compose up -d // start worker and api service
+3. docker ps // check if system is running fine. There should be 4 containers running
 
 
 
