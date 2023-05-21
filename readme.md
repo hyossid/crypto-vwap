@@ -32,8 +32,7 @@
   - `available_tickers (ticker)` : It is database view to record existing tickers  
 6. **Hasura console** : This console is for DB monitoring for good development experience. It also tracks schema migration
 
-<img width="906" alt="image" src="https://github.com/hyossid/crypto-vwap/assets/34973707/c573064a-d96b-40ff-9cc2-7c40ed4797f9">
-
+<img width="898" alt="image" src="https://github.com/hyossid/crypto-vwap/assets/34973707/451de8be-f7a2-41a6-a0d3-fa5258bd1730">
 
 ## Getting started
 
