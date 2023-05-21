@@ -27,4 +27,4 @@
 - I would like to first suggest to monitor the endpoint and track the performance. We need to collect metrics like response times, success rates and rate limit violations. **Prometheus + Grafana** is a great tool to conduct monitoring metrics. 
 - Based on above metric, we'll set some scale parameter. For example, if response time is short, we can increase scale parameter. Or, if number of rate limit violation goes down to certain threshold, we can increase scale parameter too. 
 - Containerize scraper and save it to image registry, deploy to either **CloudRun** or **Google Kubernetes Engine**. If using GKE then we need to write manifest file.
-- With scaling parameter defined, using GCP cloud function, we can scale the instance of Kubernetes using Horizontal Pod Autoscaler. On HPA, we may configure minimun/maximum number of pods.
+- With scaling parameter defined, using GCP cloud function, we can scale the instance of Kubernetes using **Horizontal Pod Autoscaler**. On HPA, we may configure minimun/maximum number of pods.
