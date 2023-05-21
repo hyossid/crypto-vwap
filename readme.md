@@ -76,6 +76,14 @@ http://localhost:61790/console
 - Hasura is a graphql engine, but it is really a good tool to track migration, monitor DB and run SQL without using independent tool such as pgadmin, datagrip.
 - Using docker-compose rather than k8s since this is single-host deployment and simple. 
 
+## **Improvements**
+- Architecture : For read-heavy systems, especailly in a system where good amount of data needs to be fed, using message queue such as Kafka infront of DB writing component (consumer) is safe in terms of data integrity and scalability. It allows decoupling each systems(ig data feeder running on its own pace and data consumer running its own pace) without risk of losing data. This allows system to be scalable. On this kind of application, I would like to implement a message queue infront of DB writer assuming their will be more input data from other sources.
+
+- CI/CD : I would like to set up continuous integration (CI) using GitHub Actions. Whenever changes are merged into the main branch, I want it to trigger a workflow that builds a Docker image and pushes it to a designated Docker image registry.
+
+- Deployment : I would suggest to deploy this application in **GCP Cloud Run** and connect database to **BigQuery**. GCP CloudRun is Knative platform where allows scalability and economical since its billed only used amount. It just requires you to push container image to artifact registry to use in CloudRun. I would like to choose GCP BigQuery since it saves lot of data, also scalable, billed only used amount and SQL friendly. It allows columnar storage too so it is better on data analytic perspective. 
+
+
 
 ### If you do not want to use docker-compose;
 
