@@ -22,14 +22,18 @@
     - **/historical** : Returns 5 minute rolling VWAP as of a timestamp `(Params: {‘ticker’: ‘BTC’, ‘ts’: 1684083600000 })`
 
 2. **websocket-watcher**: The websocket-watcher module establishes a WebSocket connection to the designated endpoint. It validates the initial input format and saves the data to the database. Since the data received through WebSocket might be faulty, a flag is_validated is set to false for these entries.
+
 3. **vwap-calculator**: The vwap-calculator module calculates the latest VWAP based on the data received through WebSocket. It then saves the calculated VWAP value to the database, along with the corresponding ticker and timestamp in the second mark.
+
 4. **rest-watcher**: The rest-watcher module is responsible for requesting trade data from the REST endpoint. It processes the data in parallel (asynchronously) based on the ticker. It requests the data, receives the response, and updates the database with a `is_validated` flag set to true for the received entries. It also calculates the VWAP using the reliable data source obtained from the REST endpoint. Additionally, it saves the latest received timestamp (since the response is limited to 100 data points) for stateful processing.
+
 5. **Postgres** : Main database for this project. Composed of below schema;
   - `transactions (tradeid, quantity, price, ticker, ts, is_validated)` : Trade data from Websocket & REST
   - `vwap_history (ticker, price, ts, interval, is_validated)` : Calculated VWAP values in timeseries
   - `latest_vwap_history (ticker, price, ts, interval)` : Latest VWAP 
   - `tickers_validation_timestamp (ticker, validated_until)` : Records last validated timestamp by ticker
   - `available_tickers (ticker)` : It is database view to record existing tickers  
+
 6. **Hasura console** : This console is for DB monitoring for good development experience. It also tracks schema migration
 
 <img width="898" alt="image" src="https://github.com/hyossid/crypto-vwap/assets/34973707/451de8be-f7a2-41a6-a0d3-fa5258bd1730">
