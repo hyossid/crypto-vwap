@@ -9,7 +9,10 @@ The configuration options for the input channels and the interval (defaulted to 
 
 
 **VWAP-Processor is composed as:**
+
 <img width="705" alt="image" src="https://github.com/hyossid/crypto-vwap/assets/34973707/4b967959-dc32-4853-a4c4-94fe292ea5cc">
+
+
 
 
 1. API Controller : API Controller is a node.js REST API server where handles user's request, pulls data from DB and give response. Input us guarded using `guard` Nest.js decorator. Swagger is available on `<host>:port/swagger.json`. 
