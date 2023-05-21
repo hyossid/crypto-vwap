@@ -8,9 +8,9 @@
  The configuration options for the input channels and the interval (defaulted to 5 minutes) can be customized through environment variables.
 
 
-## Components of VWAP-Processor
+## VWAP-Processor HDL(high level design)
 
-<img width="705" alt="image" src="https://github.com/hyossid/crypto-vwap/assets/34973707/4b967959-dc32-4853-a4c4-94fe292ea5cc">
+<img width="726" alt="image" src="https://github.com/hyossid/crypto-vwap/assets/34973707/069a654b-ec23-4a7e-aa32-a169d6b45dd3">
 
 
 
