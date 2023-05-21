@@ -33,13 +33,6 @@
 6. **Hasura console** : This console is for DB monitoring for good development experience. It also tracks schema migration
 
 
-## **Rationale behind design**
-- For calculating VWAP, we have to use transaction supporting library & database, thats how I came across with `slonik` and `postgres` to use RDB. For calculating VWAP, SQL is much reliable than other query languages so decided to use RDB `Postgres`
-- Data streaming usually requires buffer. However, assuming each record is 0.1KB, and rate seems to be maximum 50 records per second in websocket. 0.1 * 50 * 100000 (approximate 1day) = 500MB per day, 50 * 4 = 200 QPS for postgres is not heavy either read/write. 
-- Isolation level of read-commited is enough since we have `tickers_validation_timestamp` table for tracking last updated timestamp. Which means, each asynchronous process in `rest-worker` does not process other data outside their data boundary. 
-- Hasura is a graphql engine, but it is really a good tool to track migration, monitor DB and run SQL without using independent tool such as pgadmin, datagrip.
-- Using docker-compose rather than k8s since this is single-host deployment and simple. 
-
 ## Getting started
 
 **Make sure port 3003(api), 61790(hasura), 61791(postgres) is not in use**
@@ -74,6 +67,15 @@ curl localhost:3003/latest?ticker=BTC
 ```
 http://localhost:61790/console 
 ```
+
+
+## **Rationale behind design**
+- For calculating VWAP, we have to use transaction supporting library & database, thats how I came across with `slonik` and `postgres` to use RDB. For calculating VWAP, SQL is much reliable than other query languages so decided to use RDB `Postgres`
+- Data streaming usually requires buffer. However, assuming each record is 0.1KB, and rate seems to be maximum 50 records per second in websocket. 0.1 * 50 * 100000 (approximate 1day) = 500MB per day, 50 * 4 = 200 QPS for postgres is not heavy either read/write. 
+- Isolation level of read-commited is enough since we have `tickers_validation_timestamp` table for tracking last updated timestamp. Which means, each asynchronous process in `rest-worker` does not process other data outside their data boundary. 
+- Hasura is a graphql engine, but it is really a good tool to track migration, monitor DB and run SQL without using independent tool such as pgadmin, datagrip.
+- Using docker-compose rather than k8s since this is single-host deployment and simple. 
+
 
 ### If you do not want to use docker-compose;
 
