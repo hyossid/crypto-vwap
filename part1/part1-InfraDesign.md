@@ -5,11 +5,11 @@
 - If API provider supports `HEAD` endpoint, it would be a good option to hit `HEAD` request first. `HEAD` is normally used to check if `GET` endpoint is available especially when `GET` endpoint produces large data download. It reads `Content-Length` header of `GET`, so by polling this cheaper `HEAD` endpoint, we would know when data is available and scrape it once it is ready. 
 - If API provider has web html which can be clue of data availability, we can scrape that html and check using python web scraper as another solution too.  
 - If API provider does not support `HEAD` nor HTML, I could think of below solution; 
-  - After end of day from midnight, do endpoint polling at the beginning in certain interval (ig. 30 mins cronjob) until you get successful response, then record the timestamp. (Cronjob using GCP Cloud Function and sink to Cloud storage or Bigquery)
-  - Following above manner, collect the data with tag (ticker , timestamp)
-  - With enough data collected, do train simple regression model or simple neural network such as FNN, we can use Google Colab and do data engineering in pandas, import model using pytorch. Colab is available in GCP marketplace so can easily import data in GCP databases.
-  - Predict and assign scores by time window
-  - With built model, we can request expensive REST api at the end of timewindow which has the highest score. 
+  1. After end of day from midnight, do endpoint polling at the beginning in certain interval (ig. 30 mins cronjob) until you get successful response, then record the timestamp. (Cronjob using GCP Cloud Function and sink to Cloud storage or Bigquery)
+  2. Following above manner, collect the data with tag (ticker , timestamp)
+  3. With enough data collected, do train simple regression model or simple neural network such as FNN, we can use Google Colab and do data engineering in pandas, import model using pytorch. Colab is available in GCP marketplace so can easily import data in GCP databases.
+  4. Predict and assign scores by time window
+  5. With built model, we can request expensive REST api at the end of timewindow which has the highest score. 
  
 ### 2. We have a SQL trade history database with unique order ID’s. There are multiple parallel scripts recording to the database. How do you prevent collisions in generating a new order ID from one of the parallel scripts? What database would be best for this?
 
