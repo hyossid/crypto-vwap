@@ -8,7 +8,7 @@ To be considered as valid data for processing, the input should follow the forma
 The configuration options for the input channels and the interval (defaulted to 5 minutes) can be customized through environment variables.
 
 
-**VWAP-Processor is composed as:**
+## Components of VWAP-Processor
 
 <img width="705" alt="image" src="https://github.com/hyossid/crypto-vwap/assets/34973707/4b967959-dc32-4853-a4c4-94fe292ea5cc">
 
@@ -25,12 +25,17 @@ The configuration options for the input channels and the interval (defaulted to 
 3. vwap-calculator: The vwap-calculator module calculates the latest VWAP based on the data received through WebSocket. It then saves the calculated VWAP value to the database, along with the corresponding ticker and timestamp in the second mark.
 4. rest-watcher: The rest-watcher module is responsible for requesting trade data from the REST endpoint. It processes the data in parallel (asynchronously) based on the ticker. It requests the data, receives the response, and updates the database with a is_validated flag set to true for the received entries. It also calculates the VWAP using the reliable data source obtained from the REST endpoint. Additionally, it saves the latest received timestamp (since the response is limited to 100 data points) for stateful processing.
 5. Postgres : Main database for this project. 
-
+  - transactions (tradeid, quantity, price, ticker, ts, is_validated) : Trade data from Websocket & REST
+  - vwap_history (ticker, price, ts, interval, is_validated) : Calculated VWAP values in timeseries
+  - latest_vap_history (ticker, price, ts, interval) : Latest VWAP 
+  - tickers_validation_timestamp (ticker, validated_until) : Records last validated timestamp by ticker
+  - available_tickers (ticker) : It is database view to record existing tickers  
 6. Hasura console : This console is for DB monitoring for good development experience. It also tracks schema migration
 
 rational behind design : 
 - Hasura is a graphql engine, but it is really a good tool to track migration, monitor DB and run SQL without using independent tool such as pgadmin, datagrip.
 - using slonik rather than ORM, since sql is much reliable.
+
 ## Getting started
 
 1. ./bin/start_db up 
