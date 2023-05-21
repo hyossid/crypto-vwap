@@ -32,7 +32,8 @@
   - `available_tickers (ticker)` : It is database view to record existing tickers  
 6. **Hasura console** : This console is for DB monitoring for good development experience. It also tracks schema migration
 
-**Rationale behind design**
+
+## **Rationale behind design**
 - For calculating VWAP, we have to use transaction supporting library & database, thats how I came across with `slonik` and `postgres` to use RDB. For calculating VWAP, SQL is much reliable than other query languages so decided to use RDB `Postgres`
 - Data streaming usually requires buffer. However, assuming each record is 0.1KB, and rate seems to be maximum 50 records per second in websocket. 0.1 * 50 * 100000 (approximate 1day) = 500MB per day, 50 * 4 = 200 QPS for postgres is not heavy either read/write. 
 - Isolation level of read-commited is enough since we have `tickers_validation_timestamp` table for tracking last updated timestamp. Which means, each asynchronous process in `rest-worker` does not process other data outside their data boundary. 
