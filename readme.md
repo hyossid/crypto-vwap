@@ -3,7 +3,7 @@
 
  This project provides a VWAP (Volume-weighted average price) calculator. The VWAP is calculated based on data received from two channels: a **WebSocket channel (which may occasionally be faulty)** and a **reliable REST channel**. 
  
- To be considered as valid data for processing, the input should follow the format (ticker, ts, quantity, price, tradeId). 
+ To be considered as valid data for processing, the input should follow the format `(ticker, ts, quantity, price, tradeId)`. 
  
  The configuration options for the input channels and the interval (defaulted to 5 minutes) can be customized through environment variables.
 
