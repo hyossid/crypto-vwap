@@ -51,20 +51,20 @@ docker-compose up -d
 
 ### Check if system is running fine. There should be 4 containers running
 
-```
+```bash
 docker ps 
 ```
 
 ### Test API
 
-```
+```bash
 curl localhost:3003/health 
 curl localhost:3003/latest?ticker=BTC
 ```
 
 ### Access hasura console for db checking, **password is sidneyPassword**
 
-```
+```bash
 http://localhost:61790/console 
 ```
 
@@ -79,13 +79,14 @@ http://localhost:61790/console
 
 ### If you do not want to use docker-compose;
 
+```bash
 docker build -f Dockerfile.worker -t crypto_market_worker . 
 docker run --network=crypto_market_default -e PG_STRING=postgres://postgres:postgres@postgres/crypto_market --name crypto_market_worker crypto_market_worker
 
 
 docker build -f Dockerfile.api -t crypto_market_api .
 docker run --network=crypto_market_default -e PG_STRING=postgres://postgres:postgres@postgres/crypto_market --name crypto_market_api -p 3003:3003 crypto_market_api
-
+```
 
 
 
