@@ -17,8 +17,10 @@ becomes available?
 How do you prevent collisions in generating a new order ID from one of the parallel scripts? What database would be best
 for this?
 
-- Depending on the nature of data write, I would decide the database isolation level first. (Either read commited , non-repeatable read, serializable)
-- If not serializalbe, then  
+- Depending on the nature of data write, I would like to decide the database isolation level first. (Either read commited , non-repeatable read, serializable)
+- If Serializalbe, then can just use auto-increment ID which is supported by lots of relational database like Postgres, MariaDB
+- If other isolation level, I would do the following
+  - 
 
 Postgres 
 Scalable DB - Cassandra 
