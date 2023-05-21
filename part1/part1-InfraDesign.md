@@ -23,6 +23,6 @@
 
 ### 3. We want to scrape a large amount of data from a particular endpoint as quickly as possible, but the endpoint has server-side constraints on the number of requests per second it can take. How do you deploy a scraper that dynamically shrinks/scales to scrape data as quickly as possible?
 
-- I would like to first suggest to make a requests as it is, then when we face latency or quite a number of 500 requests, 
-- Endpoints designed for scraping often exhibit similar patterns or characteristics on a daily basis. For instance, there are usually consistent peak hours of requests observed throughout the day.
-- Hence, it is beneficial to capture the throttling instances on a daily basis(timestamp, throttled_number), including the number of occurrences and corresponding timestamps. By recording historical data, it becomes possible to identify optimal time windows and maintain an appropriate frequency for data collection or scraping operations.
+- Endpoints designed for scraping often exhibit similar patterns or characteristics on a daily basis. For instance, there are usually consistent peak hours of requests observed throughout the day. Therefore, I think it is important to know the pattern of request in server-side. Best would be the choice where service provider offers the metric, but I'll assume that is not the case.
+- I would like to first suggest to make a requests as it is, either it is websocket, long polling or regular polling. We'll face latency or error respones of 500 on specific time window.  
+- We'll capture the throttling instances on a daily basis(timestamp, throttled_number), including the number of occurrences and corresponding timestamps. By recording historical data, it becomes possible to identify optimal time windows and maintain an adequate frequency for data collection or scraping operations. 
