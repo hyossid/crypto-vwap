@@ -28,9 +28,9 @@
 4. **rest-watcher**: The rest-watcher module is responsible for requesting trade data from the REST endpoint. It processes the data in parallel (asynchronously) based on the ticker. It requests the data, receives the response, and updates the database with a `is_validated` flag set to true for the received entries. It also calculates the VWAP using the reliable data source obtained from the REST endpoint. Additionally, it saves the latest received timestamp (since the response is limited to 100 data points) for stateful processing.
 
 5. **Postgres** : Main database for this project. Composed of below schema;
-  - `transactions (tradeid, quantity, price, ticker, ts, is_validated)` : Trade data from Websocket & REST
-  - `vwap_history (ticker, price, ts, interval, is_validated)` : Calculated VWAP values in timeseries
-  - `latest_vwap_history (ticker, price, ts, interval)` : Latest VWAP 
+  - `transactions (tradeid, quantity, price, ticker, ts, is_validated)` : Trade data from Websocket & REST **index on ticker**
+  - `vwap_history (ticker, price, ts, interval, is_validated)` : Calculated VWAP values in timeseries, **index on ticker**
+  - `latest_vwap_history (ticker, price, ts, interval)` : Latest VWAP **index on ticker**
   - `tickers_validation_timestamp (ticker, validated_until)` : Records last validated timestamp by ticker
   - `available_tickers (ticker)` : It is database view to record existing tickers  
 
