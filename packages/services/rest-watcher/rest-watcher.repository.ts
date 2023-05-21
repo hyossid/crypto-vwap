@@ -12,7 +12,7 @@ import {
 } from './rest-watcher.repository.sql';
 
 const INTERVAL = process.env.INTERVAL
-  ? Number(process.env.INTERVAL)
+  ? Number.parseInt(process.env.INTERVAL, 10)
   : 5 * 60 * 1000;
 
 export class RestWatcherRepository {
@@ -23,16 +23,19 @@ export class RestWatcherRepository {
     private readonly persistentService: PersistentService,
   ) {}
 
+  // get available tickers from view
   async getSupportedTickers() {
     return this.persistentService.pgPool.any(sql<AvailableTickers>`
         select * from crypto_market.available_tickers;`);
   }
 
+  // get last validated timestamp
   async getLatestValidatedTime(ticker: string) {
     return this.persistentService.pgPool.any(sql<TickersValidationTimestamp>`
         select * from crypto_market.tickers_validation_timestamp where ticker = ${ticker};`);
   }
 
+  // Upsert transaction data with 'is_validated=true' flag
   async insertReliableTransaction(params: {
     ts: number;
     ticker: string;
@@ -64,10 +67,11 @@ export class RestWatcherRepository {
       await this.persistentService.pgPool.any(sql<_void>`
           update crypto_market.tickers_validation_timestamp
               set validated_until = ${params.ts}
-          where ticker = ${params.ticker};`); // check sequence
+          where ticker = ${params.ticker};`);
     });
   }
 
+  // Recalculate VWAP with reliable data
   async processSavingValidatedVolumeInDB(params: {
     ticker: string;
     ts: number;

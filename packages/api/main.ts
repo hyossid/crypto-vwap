@@ -25,6 +25,7 @@ async function bootstrap() {
 
   const logger: LoggerService = new ConsoleLogger();
 
+  // Nest.js supported swagger builder
   const swaggerBuilder = new DocumentBuilder()
     .addBearerAuth()
     .setTitle('VWAP API')
@@ -56,6 +57,7 @@ async function bootstrap() {
       process.exit(1);
     });
 
+  // Port setting
   const port = Number.parseInt(process.env.PORT ?? '3003', 10);
   await Promise.all([
     app.listen(port, () =>

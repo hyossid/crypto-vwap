@@ -10,6 +10,14 @@ async function bootstrap() {
 
   const worker = app.get(MarketWatcherService);
 
+  /**
+   * Can switch on and off each features in worker
+   *
+   * - websocket : Listens and save streamed data to DB
+   * - rest : Validates saved data and recalculate VWAP value
+   * - vwapdb : Calculate VWAP from existing trade data
+   *
+   **/
   await worker.start({ websocket: true, rest: true, vwapdb: true });
 }
 

@@ -10,6 +10,8 @@ export class DefaultMarketWatcherServiceService
   implements MarketWatcherService
 {
   private logger = new Logger(DefaultMarketWatcherServiceService.name);
+
+  // Concurrency set to 25 for async processing
   private readonly queue = new PQueue({ concurrency: 25 });
 
   constructor(

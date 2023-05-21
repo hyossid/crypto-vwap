@@ -15,6 +15,8 @@ export class WebSocketWatcherRepository {
     private readonly persistentService: PersistentService,
   ) {}
 
+  // Save raw transaction received from websocket stream
+  // websocket raw transaction can be faulty; is_validated = false
   async insertTransaction(params: {
     ts: number;
     ticker: string;
@@ -47,6 +49,8 @@ export class WebSocketWatcherRepository {
     );
   }
 
+  // Save the smallest timestamp to the config table 'tickers_validation_timestamp'
+  // If DB already keeps the ticker and value, skip it.
   async insertInitialValidationTime(params: { ts: number; ticker: string }) {
     await this.persistentService.pgPool.transaction(async conn => {
       const curTs = await conn.any(sql<ValidatedUntil>`

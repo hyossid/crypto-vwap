@@ -24,8 +24,7 @@ describe('Rest Validator smoke testing', () => {
 
   it('Ticker', async () => {
     const ticker = 'BTC';
-    const ans = await restWatcherService.processRestByTicker(ticker);
-    console.log(ans);
+    await restWatcherService.processRestByTicker(ticker);
   });
 
   it('getLatestValidatedTimestamp', async () => {

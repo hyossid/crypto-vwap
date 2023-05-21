@@ -8,7 +8,7 @@ import {
 } from './vwap-calculator.repository.sql';
 
 const INTERVAL = process.env.INTERVAL
-  ? Number(process.env.INTERVAL)
+  ? Number.parseInt(process.env.INTERVAL, 10)
   : 5 * 60 * 1000;
 export class VWAPCalculatorRepository {
   private readonly logger = new Logger(VWAPCalculatorRepository.name);
@@ -32,10 +32,12 @@ export class VWAPCalculatorRepository {
                 where ticker = ${ticker} and ts = ${ts};`);
   }
 
+  // Start calculating VWAP in 1 second marks, mainly for latest 5 minute value.
   async processSavingVolumeInDb() {
     const currentTimestampInSeconds = Math.floor(Date.now() / 1000) * 1000;
 
     await this.persistentService.pgPool.transaction(async conn => {
+      // In single database transaction, get latest 5 mins trades and calculate VWAP by ticker
       const vwaps = await conn.any(sql<TickerVwap>`
       with txs as (
         select *
@@ -45,6 +47,7 @@ export class VWAPCalculatorRepository {
                   from txs 
                   group by txs.ticker;`);
 
+      // Save calcuated VWAP to vwap_history table
       for (const vwap of vwaps) {
         await this.persistentService.pgPool.query(sql<_void>`
                   insert into crypto_market.vwap_history
@@ -56,6 +59,7 @@ export class VWAPCalculatorRepository {
                           ${false})
                   on conflict(ticker,ts) do nothing;`);
 
+        // Upsert latest VWAP in latest_vwap_history table
         await this.persistentService.pgPool.query(sql<_void>`
                   insert into crypto_market.latest_vwap_history
                       (ticker, ts, price, interval)
@@ -67,6 +71,7 @@ export class VWAPCalculatorRepository {
                   ts = ${currentTimestampInSeconds},
                   price = ${vwap.vwap};`);
 
+        // TODO : Remove? makes log dirty
         this.logger.log(
           `[WebSocket] Calculated and saving VWAP of ${vwap.ticker} at timestamp : ${currentTimestampInSeconds}`,
         );

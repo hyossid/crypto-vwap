@@ -8,9 +8,7 @@ import {
 import { WebSocketWatcherRepository } from './websocket-watcher.repository';
 
 const WEBSOCKET_RECONNECT = 100;
-const MARKET_WS_URL = process.env.MARKET_WS_URL
-  ? process.env.MARKET_WS_URL
-  : 'ws://35.241.105.108/stream';
+const MARKET_WS_URL = process.env.MARKET_WS_URL ?? 'ws://35.241.105.108/stream';
 
 export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
   private logger = new Logger(DefaultWebSocketWatcherService.name);
@@ -49,6 +47,8 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
 
     this.client.onerror = async (event: { error: Error }) => {
       this.onError(event.error);
+
+      // In case websocket error occurs, reconnect after 100ms
       await new Promise(f => setTimeout(f, WEBSOCKET_RECONNECT));
       await this.restartUnexpectedClosedWebsocket();
     };
@@ -59,11 +59,16 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
       try {
         const m = JSON.parse(msg);
 
+        // Save the smallest ts value in websocket.
         await this.webSocketWatcherRepository.insertInitialValidationTime({
           ts: m.ts,
           ticker: m.ticker,
         });
-        // TODO : Validate input
+
+        // Process the input and type safety again.
+        this.validateInput(m);
+
+        // Insert raw transaction to database
         await this.insertTransactionToDB({
           ts: m.ts,
           ticker: m.ticker,
@@ -84,6 +89,7 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
           `[WebSocket] Connection closed unexpectedly or because of timeout. Reconnecting after ${WEBSOCKET_RECONNECT}ms.`,
         );
 
+        // In case websocket is closed, reconnect after 100ms
         await new Promise(f => setTimeout(f, WEBSOCKET_RECONNECT));
         await this.restartUnexpectedClosedWebsocket();
       } else {
@@ -111,6 +117,7 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
     this.onReconnect();
   }
 
+  // Insert raw transaction to database
   async insertTransactionToDB({
     ts,
     ticker,
@@ -126,6 +133,29 @@ export class DefaultWebSocketWatcherService implements WebSocketWatcherService {
       tradeid,
     });
     return;
+  }
+
+  // Perform validation checks
+  async validateInput(m: any) {
+    if (typeof m.ts !== 'number') {
+      throw new Error('[Websocket] ts must be a number');
+    }
+
+    if (typeof m.ticker !== 'string') {
+      throw new Error('ticker must be a string');
+    }
+
+    if (typeof m.quantity !== 'number') {
+      throw new Error('quantity must be a number');
+    }
+
+    if (typeof m.price !== 'number') {
+      throw new Error('price must be a number');
+    }
+
+    if (typeof m.tradeid !== 'string') {
+      throw new Error('tradeid must be a string');
+    }
   }
 }
 
