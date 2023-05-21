@@ -1,8 +1,6 @@
-### Part1 - Infra Design
+## Part1 - Infra Design
 
-1. There is a REST endpoint that provides end of day data for a variety of tickers. However, data becomes available by ticker at
-inconsistent different times after end of day. Suppose the endpoint is expensive to query. How do you scrape data as it
-becomes available?
+### 1. There is a REST endpoint that provides end of day data for a variety of tickers. However, data becomes available by ticker at inconsistent different times after end of day. Suppose the endpoint is expensive to query. How do you scrape data as it becomes available?
 
 - If API provider supports `HEAD` endpoint, it would be a good option to hit `HEAD` request first. `HEAD` is normally used to check if `GET` endpoint is available especially when `GET` endpoint produces large data download. It reads `Content-Length` header of `GET`, so by polling this cheaper `HEAD` endpoint, we would know when data is available and scrape it once it is ready. 
 - If API provider has web html which can be clue of data availability, we can scrape that html and check using python web scraper as another solution too.  
@@ -13,9 +11,7 @@ becomes available?
   - Predict and assign scores by time window
   - With built model, we can request expensive REST api at the end of timewindow which has the highest score. 
  
-2. We have a SQL trade history database with unique order ID’s. There are multiple parallel scripts recording to the database.
-How do you prevent collisions in generating a new order ID from one of the parallel scripts? What database would be best
-for this?
+### 2. We have a SQL trade history database with unique order ID’s. There are multiple parallel scripts recording to the database. How do you prevent collisions in generating a new order ID from one of the parallel scripts? What database would be best for this?
 
 - Best option I can think of is to generate **ULID** from each independent script and save it to database. Similar to UUID, it can be generated in an isolated process, ensuring uniqueness even in distributed environments. However, it is generated in timely manner. Which means, it would significantly improve the query efficiency of database since its sorted. Also, if database needs to be migrated with other databases in the future, you won't have to worry about primary key collision since ULID won't collide. 
 - However, generating ULID needs programming language, imagine script is written in bash. On that case we got to use **UUID** as an alternative. Like ULID, it can be generated in isolated process, ensuring uniqueness. The process of generating UUIDs does not rely on complex algorithms, making it straightforward. It is also standardized by RFC where ULID is not that standardized yet. https://www.ietf.org/rfc/rfc4122.txt
@@ -25,9 +21,7 @@ for this?
 
 
 
-3. We want to scrape a large amount of data from a particular endpoint as quickly as possible, but the endpoint has server-side
-constraints on the number of requests per second it can take. How do you deploy a scraper that dynamically shrinks/scales
-to scrape data as quickly as possible?
+### 3. We want to scrape a large amount of data from a particular endpoint as quickly as possible, but the endpoint has server-side constraints on the number of requests per second it can take. How do you deploy a scraper that dynamically shrinks/scales to scrape data as quickly as possible?
 
 - I would like to first suggest to make a requests as it is, then when we face latency or quite a number of 500 requests, 
 - Endpoints designed for scraping often exhibit similar patterns or characteristics on a daily basis. For instance, there are usually consistent peak hours of requests observed throughout the day.
