@@ -18,13 +18,9 @@ How do you prevent collisions in generating a new order ID from one of the paral
 for this?
 
 - Best option I can think of is to generate **ULID** from each independent script and save it to database. Similar to UUID, it can be generated in an isolated process, ensuring uniqueness even in distributed environments. However, it is generated in timely manner. Which means, it would significantly improve the query efficiency of database since its sorted. Also, if database needs to be migrated with other databases in the future, you won't have to worry about primary key collision since ULID won't collide. 
-
 - However, generating ULID needs programming language, imagine script is written in bash. On that case we got to use **UUID** as an alternative. Like ULID, it can be generated in isolated process, ensuring uniqueness. The process of generating UUIDs does not rely on complex algorithms, making it straightforward. It is also standardized by RFC where ULID is not that standardized yet. https://www.ietf.org/rfc/rfc4122.txt
-
 - If we don't have to think of database migration, there are other options of using **auto-increment ID**. This approach is slightly easiler since we are forwarding the responsibility of having unique ID to persistent layer (DB) from application layer, so each parallel scripts dont have to care about saving data in database. Of course we don't have to worry about database isolation level in this case too. **auto-increment ID** is supported by lots of relational database like Postgres(sequences), MariaDB. Sequential ID is best in terms of data storing since it allows efficient query. 
-
 - I would choose to use relational database like **Postgres** since its record of `transactions`. Documental model database such as MongoDB is good for the data which has high locality (like user profiles), where it doesnt apply well on this case.
-
 - There is also a project called Snowflake ID by twitter. This is just for reference https://betterprogramming.pub/uuid-generation-snowflake-identifiers-unique-2aed8b1771bc
 
 
