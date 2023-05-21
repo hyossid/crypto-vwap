@@ -59,8 +59,8 @@ docker ps
 ### Test API
 
 ```bash
-curl localhost:3003/health 
-curl localhost:3003/latest?ticker=BTC
+curl localhost:3003/health // test OK
+curl localhost:3003/latest?ticker=BTC // get latest VWAP value of BTC
 ```
 
 ### Access hasura console for db checking, **password is sidneyPassword**
